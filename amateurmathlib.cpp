@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "amateurmathlib.h"
 #include <string>
 #include <iomanip>
@@ -412,7 +412,6 @@ Matrix jacobi_iter(Matrix m, Matrix b, double eps)
 }
 
 
-//не работает должным образом
 double newton(Func f, double x, double eps)
 {
 	//x = x - df(x) / f;
@@ -420,14 +419,111 @@ double newton(Func f, double x, double eps)
 
 	while (42)
 	{
+		//int n = 0;
 		double last = x;
 		double df = (f(x + eps) - f(x)) / eps;
-		x = last - df / f(x);
+		x = last - f(x) / df;
+		//n++;
 		if ( abs(x-last) < eps )
 		{
 			break;
 		}
 	}
-
+	//cout << n << endl;
 	return x;
 }
+
+
+double m_hord(Func f, double x, double eps)
+{
+//x_k+1 x_k-f(x_k) / ( f(a) - (f(x_k)*(a-x_k));
+
+	double a = x - eps; 
+	while (42)
+	{
+		//int n = 0;
+		double last = x;
+		//double df = (f(x + eps) - f(x)) / eps;
+		x = last - f(last) * (a - last) / ( f(a) - f(last) );
+		//n++;
+		if (abs(x - last) < eps)
+		{
+			break;
+		}
+	}
+	//cout << n << endl;
+	return x;
+}
+
+double m_iter(Func f, double x, double eps)
+{
+
+	//f(x) = 0; -> x = g(x);
+	double a = x - eps;
+	while (42)
+	{
+
+		double last = x;
+
+		x = last + f(x);
+
+		if (abs(x - last) < eps)
+		{
+			break;
+		}
+	}
+	//cout << n << endl;
+	return x;
+}
+
+double helper_int_rect(Func f, double a, double b, double h)
+{
+	double sum = 0;
+	int n = ceil( ( b - a ) / h ); //округление вверх
+	for (double x = a; x < b; x += h)
+	{
+		sum += f(x) * h;
+	}
+
+	return sum;
+
+}
+
+
+double int_rect(Func f, double a, double b, double eps)		//интегрирование методом трапеций
+{
+	constexpr double magic = 10.;
+	double h = (b - a) / magic;
+	double I = helper_int_trap(f, a, b, h);
+	while (42)
+	{
+		
+		h = h / 2.;
+		double I_half = helper_int_trap(f, a, b, h);
+		double R = (I - I_half) / 1;
+		if (abs(R) < eps)
+		{
+			return I_half;
+		}
+		I = I_half;
+
+
+
+	}
+
+
+}
+
+/*
+//заготовка метода Эйлера
+double ode_Euler(Func2 f, double x0, double y0, double x, double h)
+{
+	while (x0 < x)
+	{
+		y0 = y0 + f(x0, y0) * h;
+		x0 = x0 + h;
+	}
+	return y0;
+}
+
+*/
