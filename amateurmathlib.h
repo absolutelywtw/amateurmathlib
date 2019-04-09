@@ -1,6 +1,7 @@
-﻿#pragma once
+#pragma once
 #include <iostream>
 #include <vector>
+
 using namespace std;
 
 class Matrix
@@ -50,8 +51,14 @@ Matrix jacobi_iter(Matrix m, Matrix b, double eps);				//метод Якоби
 
 //передаем функцию
 using Func = double(double);
+using Func2 = double(double, double);
 /*
 using my_int = int;
 using dvect = vector<double>;
 */
 double newton(Func f, double x, double eps = 0.0001);
+double m_hord(Func f, double x, double eps = 0.0000001);
+double m_iter(Func f, double x, double eps = 0.0001);
+
+
+double int_rect(Func f, double a, double b, double eps = 0.1);
