@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include <iostream>
 #include <vector>																//библиотека по работе с векторами
 #include <string>
@@ -65,7 +65,7 @@ int main()
 
 
 	//Matrix x = jordan_gauss(a, b);
-	//починить
+
 
 	//Matrix c = inv_jg(a);
 
@@ -82,7 +82,12 @@ int main()
 	*/
 	// cout << jacobi_iter(a, b, 0.001);
 
-	cout << newton(f1, -2.2) << endl;
+	//cout << newton(f1, -2.2) << endl;
+	//cout << m_hord(f1, -10) << endl;
+
+	//cout << m_hord(f1, -10) << endl;
+
+	cout << int_rect(f1, 0, 2, 0.0000001) << endl;
 
 	return 0;
 }
