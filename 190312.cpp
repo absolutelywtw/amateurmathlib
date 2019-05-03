@@ -9,8 +9,16 @@ using namespace std;
 
 double f1(double x)
 {
-	return x * x - 4;
+	return x * x * exp(x) - 4;
+	
 }
+
+double f2(double x, double y)
+{
+	return x + y;
+}
+
+
 
 int main()
 {
@@ -87,7 +95,44 @@ int main()
 
 	//cout << m_hord(f1, -10) << endl;
 
-	cout << int_rect(f1, 0, 2, 0.0000001) << endl;
+
+	/*
+	cout << int_rect(f1, 0, 2, 0.01) << endl;
+	cout << int_trap(f1, 0, 2, 0.01) << endl;
+	cout << int_simpson(f1, 0, 2, 0.01) << endl;
+
+	cout << endl;
+
+	cout << int_rect(f1, 0, 2, 0.00001) << endl;
+	cout << int_trap(f1, 0, 2, 0.00001) << endl;
+	cout << int_simpson(f1, 0, 2, 0.00001) << endl;
+	*/
+
+	//cout << ode_Euler(f2, 0, 1, 2, 0.001);
+
+
+	/*
+	vector<Funcs*> funcs(2);
+
+	funcs[0] = [](double x, vector<double> y) -> double
+	{
+		return y[1];
+	};
+	funcs[1] = [](double x, vector<double> y) -> double
+	{
+		return x + 2 * y[0] - y[1];
+	};
+	double x0 = 0;
+	vector<double> y0 = { 3. / 4., 1. / 2. };
+	vector<double> y = helper_vode_Euler(funcs, x0, y0, 2., 10000);
+
+	for (auto el: y)
+	{
+		cout << el << endl;
+	}
+
+	*/
+	
 
 	return 0;
 }
