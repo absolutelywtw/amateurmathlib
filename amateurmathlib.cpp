@@ -476,10 +476,14 @@ double m_iter(Func f, double x, double eps)
 	return x;
 }
 
-double helper_int_rect(Func f, double a, double b, double h)
+
+
+
+
+double helper_int_rect(Func f, double a, double b, int n)
 {
+	double h = (b - a) / n;
 	double sum = 0;
-	int n = ceil( ( b - a ) / h ); //округление вверх
 	for (double x = a; x < b; x += h)
 	{
 		sum += f(x) * h;
@@ -490,16 +494,15 @@ double helper_int_rect(Func f, double a, double b, double h)
 }
 
 
-double int_rect(Func f, double a, double b, double eps)		//интегрирование методом трапеций
+double int_rect(Func f, double a, double b, double eps)		//интегрирование методом прямоугольников
 {
-	constexpr double magic = 10.;
-	double h = (b - a) / magic;
-	double I = helper_int_trap(f, a, b, h);
+	int n = 2;
+	double I = helper_int_rect(f, a, b, n);
 	while (42)
 	{
 		
-		h = h / 2.;
-		double I_half = helper_int_trap(f, a, b, h);
+		n *= 2;
+		double I_half = helper_int_rect(f, a, b, n);
 		double R = (I - I_half) / 1;
 		if (abs(R) < eps)
 		{
@@ -514,16 +517,184 @@ double int_rect(Func f, double a, double b, double eps)		//интегриров�
 
 }
 
-/*
-//заготовка метода Эйлера
-double ode_Euler(Func2 f, double x0, double y0, double x, double h)
+double helper_int_trap(Func f, double a, double b, int n)
 {
-	while (x0 < x)
+	//I ~=  h/2 * (y_0 + 2 * sum(y_k,  k = 1..n-1) + y_n ) 
+	// = h * ( sum(y_k,  k = 1..n-1) + (y_0 + y_n) / 2 )
+
+	double h = (b - a) / n;
+	double sum = ( f(a) + f(b) ) / 2.;
+	//int n = ceil((b - a) / h); //округление вверх
+	for (double x = a+h; x < b-h; x += h)
 	{
-		y0 = y0 + f(x0, y0) * h;
-		x0 = x0 + h;
+		sum += f(x);
 	}
-	return y0;
+
+	return sum * h;
+
 }
 
+
+double int_trap(Func f, double a, double b, double eps)		
+{
+	int n = 2;
+	double I = helper_int_trap(f, a, b, n);
+	while (42)
+	{
+
+		n *= 2;
+		double I_half = helper_int_trap(f, a, b, n);
+		double R = (I_half - I) / 3.;
+		if (abs(R) < eps)
+		{
+			return I_half + R;
+		}
+		I = I_half;
+
+
+
+	}
+
+
+}
+
+
+double helper_int_simpson(Func f, double a, double b, double n)
+{
+	//I ~=  h/3 * ( (y_0 + y_n) + 4*sum(y_2k-1, k=1..n) + 2*sum(y_2k, k=1..n-1))
+	// = h/3 * (result1 + 4*result2 + 2*result3)
+
+
+	double h = (b - a) / n;		//на какие интервалы делится отрезок
+	double double_h = 2 * h;
+
+	double result_1 = f(a) + f(b);
+
+	double result_2 = 0.;
+	for (double x = a + h; x < b; x += double_h)
+	{
+		result_2 += f(x);
+	}
+
+	double result_3 = 0.;
+	for (double x = a + double_h; x < b; x += double_h)
+	{
+		result_3 += f(x);
+	}
+
+	return h * (result_1 + 4 * result_2 + 2 * result_3) / 3.;
+
+}
+
+double int_simpson(Func f, double a, double b, double eps)
+{
+	int n = 2;
+	double I = helper_int_simpson(f, a, b, n);
+	while (42)
+	{
+
+		n *= 2;
+		double I_half = helper_int_simpson(f, a, b, n);
+		double R = (I_half - I) / 15.;
+		if (abs(R) < eps)
+		{
+			return I_half + R;
+		}
+		I = I_half;
+
+
+
+	}
+
+
+}
+
+
+
+
+double helper_ode_Euler(Func2 f, double x0, double y0, double x, int n)
+{
+
+	double y_i = y0;
+	double h = (x - x0) / n;
+
+
+	for (double x_i = x0; x_i <= x; x_i += h)
+	{
+		y_i = y_i + h * f(x_i, y_i);
+
+	}
+
+	return y_i;
+
+}
+
+double ode_Euler(Func2 f, double x0, double y0, double x, double eps)
+{
+	int n = 2;
+	double I = helper_ode_Euler(f, x0, y0, x, n);
+	while (42)
+	{
+
+		n *= 2;
+		double I_half = helper_ode_Euler(f, x0, y0, x, n);
+		double R = (I_half - I) / 1.;
+		if (abs(R) < eps)
+		{
+			return I_half;
+		}
+		I = I_half;
+
+
+
+	}
+
+
+}
+
+
+vector<double> helper_vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, int n)
+{
+
+	vector<double> y_i = y0;
+	double h = (x - x0) / n;
+
+
+	for (double x_i = x0; x_i <= x; x_i += h)
+	{
+		for (int k = 0; k < f.size(); k++)
+		{
+			y_i[k] = y_i[k] + h * f[k](x_i, y_i);
+		}
+	}
+
+	return y_i;
+
+}
+
+/*
+double vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, double eps)
+{
+	int n = 2;
+	vector<double> y = helper_vode_Euler(f, x0, y0, x, n);
+	while (42)
+	{
+
+		n *= 2;
+		vector<double> y_half = helper_vode_Euler(f, x0, y0, x, n);
+
+		for (int k = 0, k < y.size(); k++)
+		{
+			double R = (y_half[k] - y[k]) / 1.;
+			if (abs(R) < eps)
+			{
+				return y_half;
+			}
+		}
+		y = y_half;
+
+	}
+
+
+}
 */
