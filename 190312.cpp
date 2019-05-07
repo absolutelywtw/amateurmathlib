@@ -111,7 +111,7 @@ int main()
 	//cout << ode_Euler(f2, 0, 1, 2, 0.001);
 
 
-	/*
+	
 	vector<Funcs*> funcs(2);
 
 	funcs[0] = [](double x, vector<double> y) -> double
@@ -124,14 +124,15 @@ int main()
 	};
 	double x0 = 0;
 	vector<double> y0 = { 3. / 4., 1. / 2. };
-	vector<double> y = helper_vode_Euler(funcs, x0, y0, 2., 10000);
+	S_Ode_Solver euler(s_ode_euler_koshi, 2);
+	vector<double> y = euler(funcs, x0, y0, 2., 0.0001);
 
 	for (auto el: y)
 	{
 		cout << el << endl;
 	}
 
-	*/
+	
 	
 
 	return 0;
