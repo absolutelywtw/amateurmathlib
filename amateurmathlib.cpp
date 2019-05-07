@@ -612,6 +612,7 @@ double int_simpson(Func f, double a, double b, double eps)
 
 
 
+/*
 double helper_ode_Euler(Func2 f, double x0, double y0, double x, int n)
 {
 
@@ -651,9 +652,35 @@ double ode_Euler(Func2 f, double x0, double y0, double x, double eps)
 
 
 }
+*/
 
+vector<double> s_ode_euler(vector<Funcs*> f, double x, vector<double> y, double h)
+{
+	vector<double> result( y.size() );
+	for (int k = 0; k < y.size(); k++)
+	{
+		result[k] = y[k] + h * f[k](x, y);
+	}
 
-vector<double> helper_vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, int n)
+	return result;
+}
+
+vector<double> s_ode_euler_koshi(vector<Funcs*> f, double x, vector<double> y, double h)
+{
+	vector<double> result(y.size());
+	for (int k = 0; k < y.size(); k++)
+	{
+		result[k] = y[k] + h * f[k](x, y);
+	}
+	double h_half = h / 2;
+	for (int k = 0; k < y.size(); k++)
+	{
+		result[k] = y[k] + h_half * ( f[k](x,y) + f[k](x+h, result));
+	}
+	return result;
+}
+
+/*vector<double> s_euler_solver(vector<Funcs*> f, double x0, vector<double> y0, double x, int n)
 {
 
 	vector<double> y_i = y0;
@@ -662,18 +689,19 @@ vector<double> helper_vode_Euler(vector<Funcs*> f, double x0, vector<double> y0,
 
 	for (double x_i = x0; x_i <= x; x_i += h)
 	{
-		for (int k = 0; k < f.size(); k++)
-		{
-			y_i[k] = y_i[k] + h * f[k](x_i, y_i);
-		}
+		y_i = method(f, x_i, y_i, h);
 	}
 
 	return y_i;
 
 }
+*/
+
+
+
 
 /*
-double vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, double eps)
+vector<double> vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, double eps)
 {
 	int n = 2;
 	vector<double> y = helper_vode_Euler(f, x0, y0, x, n);
@@ -682,15 +710,26 @@ double vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, doub
 
 		n *= 2;
 		vector<double> y_half = helper_vode_Euler(f, x0, y0, x, n);
-
-		for (int k = 0, k < y.size(); k++)
+			   
+		double max_R = 0;
+		for (int k = 0; k < y.size(); k++)
 		{
-			double R = (y_half[k] - y[k]) / 1.;
-			if (abs(R) < eps)
+			double R = abs(y_half[k] - y[k]);
+			if (R > max_R)
 			{
-				return y_half;
+				max_R = R;
 			}
 		}
+
+		if (max_R < eps)
+		{
+			for (int i = 0; i < y.size(); i++)
+			{
+				y_half[i] += ( (y_half[i] - y[i]) / (1.) );
+			}
+			return y_half;
+		}
+
 		y = y_half;
 
 	}
@@ -698,3 +737,62 @@ double vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, doub
 
 }
 */
+
+
+
+
+S_Ode_Solver::S_Ode_Solver(Method method, int order): method(method), order(order)			//конструктор
+{
+}
+
+vector<double> S_Ode_Solver::operator()(vector<Funcs*> f, double x0, vector<double> y0, double x, double eps)
+{
+
+	int n = 2;
+	vector<double> y = solve(f, x0, y0, x, n);
+	const double magic_denom = pow(2, order) - 1;
+	while (42)
+	{
+
+		n *= 2;
+		vector<double> y_half = solve(f, x0, y0, x, n);
+
+		double max_R = 0;
+		for (int k = 0; k < y.size(); k++)
+		{
+			double R = abs(y_half[k] - y[k])/magic_denom;
+			if (R > max_R)
+			{
+				max_R = R;
+			}
+		}
+		//cout << max_R << endl;
+		if (max_R < eps)
+		{
+			for (int i = 0; i < y.size(); i++)
+			{
+				y_half[i] += ((y_half[i] - y[i]) / (magic_denom));
+			}
+			return y_half;
+		}
+
+		y = y_half;
+
+	}
+}
+
+vector<double> S_Ode_Solver::solve(vector<Funcs*> f, double x0, vector<double> y0, double x, int n)
+{
+
+	vector<double> y_i = y0;
+	double h = (x - x0) / n;
+
+
+	for (double x_i = x0; x_i <= x; x_i += h)
+	{
+		y_i = method(f, x_i, y_i, h);
+	}
+
+	return y_i;
+
+}
