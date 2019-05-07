@@ -68,6 +68,26 @@ double int_rect(Func f, double a, double b, double eps = 0.0001);
 double int_trap(Func f, double a, double b, double eps = 0.0001);
 double int_simpson(Func f, double a, double b, double eps = 0.0001);
 
-double ode_Euler(Func2 f, double x0, double y0, double x, double eps = 0.0001);
+//double ode_Euler(Func2 f, double x0, double y0, double x, double eps = 0.0001);
 
-//double vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, double eps);
+
+//vector<double> vode_Euler(vector<Funcs*> f, double x0, vector<double> y0, double x, double eps);
+
+
+
+vector<double> s_euler_solver(vector<Funcs*> f, double x0, vector<double> y0, double x, int n);
+vector<double> s_ode_euler(vector<Funcs*> f, double x, vector<double> y, double h);
+vector<double> s_ode_euler_koshi(vector<Funcs*> f, double x, vector<double> y, double h);
+
+class S_Ode_Solver
+{
+public:
+	using Method = vector<double>(vector<Funcs*>, double, vector<double>, double);
+	S_Ode_Solver(Method *method, int order);
+
+	vector<double> operator()(vector<Funcs*> f, double x0, vector<double> y0, double x, double eps);
+private:
+	vector<double> solve(vector<Funcs*> f, double x0, vector<double> y0, double x, int n);
+	Method *method;
+	int order;
+};
