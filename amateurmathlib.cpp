@@ -680,6 +680,9 @@ vector<double> s_ode_euler_koshi(vector<Funcs*> f, double x, vector<double> y, d
 	return result;
 }
 
+//vector<double> s_ode_rk(vector<Funcs*> f, double x, vector<double> y, double h)
+
+
 /*vector<double> s_euler_solver(vector<Funcs*> f, double x0, vector<double> y0, double x, int n)
 {
 
@@ -796,3 +799,167 @@ vector<double> S_Ode_Solver::solve(vector<Funcs*> f, double x0, vector<double> y
 	return y_i;
 
 }
+
+double helper_diff_1_p1(Func f, double x, double h)
+{
+	return ( f(x+h) - f( x ) ) / h;
+}
+
+double diff_1_p1(Func f, double x, double eps)
+{
+	double h = eps;
+	double df = helper_diff_1_p1(f, x, h);
+	while (42)
+	{
+
+		h /= 2;
+		double df_half = helper_diff_1_p1(f, x, h);
+		double R = (df_half - df) / 1.;
+		if (abs(R) < eps)
+		{
+			return df_half + R;
+		}
+		df = df_half;
+
+
+
+	}
+
+
+}
+
+double helper_diff_1_p2(Func f, double x, double h)
+{
+	return (f(x + h) - f(x - h)) / (h*2);
+}
+
+double diff_1_p2(Func f, double x, double eps)
+{
+	double h = eps;
+	double df = helper_diff_1_p2(f, x, h);
+	const double magic_denom = (pow(2, 2) - 1);
+	while (42)
+	{
+
+		h /= 2;
+		double df_half = helper_diff_1_p2(f, x, h);
+		double R = (df_half - df) / magic_denom;
+		if (abs(R) < eps)
+		{
+			return df_half + R;
+		}
+		df = df_half;
+
+
+
+	}
+
+
+}
+
+double helper_diff_2_p2(Func f, double x, double h)
+{
+	return (f(x - h) - f(x)*2 + f(x + h)) / (h * h);
+}
+
+double diff_2_p2(Func f, double x, double eps)
+{
+	double h = eps;
+	double df = helper_diff_2_p2(f, x, h);
+	const double magic_denom = (pow(2, 2) - 1);
+	while (42)
+	{
+
+		h /= 2;
+		double df_half = helper_diff_2_p2(f, x, h);
+		double R = (df_half - df) / magic_denom;
+		if (abs(R) < eps)
+		{
+			return df_half + R;
+		}
+		df = df_half;
+
+
+
+	}
+
+
+}
+
+
+double minimize_dih(Func f, double a, double b, double eps)
+{
+	while (42)
+	{
+		double delta = eps / 2;
+		double half = (a + b) / 2;
+		double hme = half - delta;
+		double hpe = half + delta;
+
+		if (f(hme) < f(hpe))
+		{
+			b = hpe;
+		}
+		else
+		{
+			a = hme;
+		}
+		
+		if ((b - a)/2 < eps)
+		{
+			return (a + b) / 2;
+		}
+	}
+
+}
+
+double minimize_gold(Func f, double a, double b, double eps)
+{
+	const double magic_l = ( 3 - sqrt(5) ) / 2;
+	const double magic_r = ( sqrt(5) - 1 ) / 2;
+
+	double x1 = a + (b - a) * magic_l;
+	double x2 = a + (b - a) * magic_r;
+
+	double f1 = f(x1);
+	double f2 = f(x2);
+
+	while (42)
+	{
+		if ((b - a) / 2 < eps)
+		{
+			return (a + b) / 2;
+		}
+
+
+		if (f1 <= f2)
+		{
+			b = x2;
+			x2 = x1;
+			x1 = a + b - x2;
+
+			f2 = f1;
+			f1 = f(x1);
+		}
+		else
+		{
+			a = x1;
+			x1 = x2;
+			x2 = (a + b) - x1;
+
+			f1 = f2;
+			f2 = f(x2);
+		}
+
+
+	}
+
+}
+
+/*
+Matrix grad( FuncsV f, Matrix x )
+{
+	Matrix result( x.nRows() );
+	result[0] = ();
+}
+*/
