@@ -58,6 +58,7 @@ using dvect = vector<double>;
 */
 
 using Funcs = double(double, vector<double> );
+using FuncsV = double( Matrix );
 
 double newton(Func f, double x, double eps = 0.0001);
 double m_hord(Func f, double x, double eps = 0.0000001);
@@ -91,3 +92,11 @@ private:
 	Method *method;
 	int order;
 };
+
+
+double diff_1_p1(Func f, double x, double eps = 0.0001);
+double diff_1_p2(Func f, double x, double eps = 0.0001);
+double diff_2_p2(Func f, double x, double eps = 0.0001);
+
+double minimize_dih(Func f, double a, double b, double eps = 0.0001);
+double minimize_gold(Func f, double a, double b, double eps = 0.0001);
