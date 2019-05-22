@@ -18,6 +18,11 @@ double f2(double x, double y)
 	return x + y;
 }
 
+double f3(double x)
+{
+	return x * x;
+}
+
 
 
 int main()
@@ -111,7 +116,7 @@ int main()
 	//cout << ode_Euler(f2, 0, 1, 2, 0.001);
 
 
-	
+	/*
 	vector<Funcs*> funcs(2);
 
 	funcs[0] = [](double x, vector<double> y) -> double
@@ -131,9 +136,24 @@ int main()
 	{
 		cout << el << endl;
 	}
+	*/
+	
+	/*
+	auto f = [](double x)->double {return exp(x) + sin(x) + x * x; };
+	auto df = [](double x)->double {return exp(x) + cos(x) + x * 2; };
+	auto ddf = [](double x)->double {return exp(x) - sin(x) + 2; };
 
-	
-	
+	cout << df(1) << endl;
+	cout << diff_1_p1(f, 1, 0.01) << endl;
+	cout << diff_1_p2(f, 1, 0.01) << endl;
+	cout << endl;
+	cout << ddf(1) << endl;
+	cout << diff_2_p2(f, 1, 0.01) << endl;
+	*/
+
+	auto f = [](double x)->double {return (x+2)*(x+2)*2 - 1; };
+	cout << minimize_dih(f, -10, 10, 0.1) << endl;
+	cout << minimize_gold(f, -10, 10, 0.001) << endl;
 
 	return 0;
 }
